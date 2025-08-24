@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Running France Pro+ Final</title>
+<style>
+body { font-family: 'Poppins', sans-serif; background:#f7f7f7; color:#333; margin:0; padding:0; scroll-behavior:smooth; }
+header { position:fixed; top:0; width:100%; background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color:white; padding:20px; text-align:center; font-weight:700; z-index:1000; box-shadow:0 4px 10px rgba(0,0,0,0.15); background-size:400% 400%; animation: gradientBG 10s ease infinite; }
+@keyframes gradientBG { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+header nav a { color:white; margin:0 15px; font-weight:600; transition:0.3s; }
+header nav a:hover { text-shadow:0 0 10px rgba(255,255,255,0.7); }
+header input { margin-top:10px; padding:10px 15px; border-radius:25px; border:none; width:60%; transition: all 0.3s; }
+header input:focus { box-shadow:0 0 15px rgba(188,24,136,0.3); }
+main { margin-top:150px; }
+.card-section { background: rgba(255,255,255,0.85); backdrop-filter: blur(10px); padding:25px; border-radius:20px; margin:25px 10px; box-shadow:0 8px 20px rgba(0,0,0,0.08); transition: transform 0.4s, box-shadow 0.4s, opacity 0.5s; position: relative; opacity:0; transform: translateY(20px); }
+.card-section.show { opacity:1; transform: translateY(0); }
+.card-section:hover { transform: translateY(-5px) scale(1.02); box-shadow:0 12px 25px rgba(0,0,0,0.2); }
+h2,h3 { font-weight:700; color:#444; margin-bottom:15px; }
+input[type="text"], button { padding:10px 15px; border-radius:30px; border:1px solid #ccc; font-size:14px; margin-bottom:10px; outline:none; transition:0.3s; }
+input[type="text"]:focus { border-color:#bc1888; box-shadow:0 0 10px rgba(188,24,136,0.2); }
+button { background: linear-gradient(45deg,#bc1888,#f09433); color:white; border:none; cursor:pointer; font-weight:600; }
+button:hover { filter: brightness(1.1); transform: scale(1.05); box-shadow:0 5px 15px rgba(0,0,0,0.2); }
+ul { list-style:none; padding:0; }
+li { padding:12px; border-bottom:1px solid #eee; display:flex; align-items:center; transition: all 0.3s; border-radius:12px; }
+li:hover { background: rgba(188,24,136,0.05); transform: translateX(3px); }
+li img { width:50px; height:50px; border-radius:10px; object-fit:cover; margin-right:10px; transition: transform 0.3s; }
+li:hover img { transform: scale(1.2); }
+.fav-btn { background:none; border:none; font-size:18px; cursor:pointer; transition:0.3s; }
+.fav-btn:hover { transform: scale(1.2); color:gold; }
+.map-panel { height:450px; margin:20px 10px; border-radius:20px; box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+#chatbot { position: fixed; bottom:20px; right:20px; width:320px; display:none; flex-direction:column; z-index:1000; }
+#chatbot #chat-window { height:220px; background:white; border-radius:15px; overflow-y:auto; padding:10px; box-shadow:0 5px 15px rgba(0,0,0,0.15); }
+#chat-input { border-radius:30px; border:1px solid #ccc; padding:10px 15px; margin-top:5px; }
+#chat-toggle { position: fixed; bottom:20px; right:20px; border:none; background: linear-gradient(45deg,#bc1888,#f09433); color:white; font-size:22px; padding:14px 18px; border-radius:50%; cursor:pointer; z-index:1001; box-shadow:0 5px 15px rgba(0,0,0,0.25); transition:0.3s; }
+#chat-toggle:hover { filter: brightness(1.1); transform: scale(1.1); }
+@media(max-width:768px){ header input { width:90%; } .card-section { padding:20px; margin:15px 5px; } #chatbot { width:85%; right:7%; } li img { width:40px; height:40px; } }
+</style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+
+</head>
+<body>
+
+<header>
+  <h1>Running France Pro+ Final</h1>
+  <nav>
+    <a href="#clubs">Clubs</a>
+    <a href="#shops">Magasins</a>
+    <a href="#events">Évènements</a>
+    <a href="#map">Carte</a>
+  </nav>
+  <input type="text" id="global-search" placeholder="Recherche globale...">
+</header>
+
+<main>
+  <section id="clubs" class="card-section">
+    <h2>Clubs</h2>
+    <ul id="club-list"></ul>
+    <form id="add-club-form">
+      <input type="text" placeholder="Nom du club" required>
+      <input type="text" placeholder="Ville" required>
+      <input type="text" placeholder="Adresse complète" required>
+      <input type="text" placeholder="Site web">
+      <button type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <section id="shops" class="card-section">
+    <h2>Magasins</h2>
+    <ul id="shop-list"></ul>
+    <form id="add-shop-form">
+      <input type="text" placeholder="Nom du magasin" required>
+      <input type="text" placeholder="Ville" required>
+      <input type="text" placeholder="Adresse complète" required>
+      <input type="text" placeholder="Site web">
+      <button type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <section id="events" class="card-section">
+    <h2>Évènements</h2>
+    <ul id="event-list"></ul>
+    <form id="add-event-form">
+      <input type="text" placeholder="Nom de l'évènement" required>
+      <input type="text" placeholder="Ville" required>
+      <input type="text" placeholder="Adresse complète" required>
+      <input type="text" placeholder="Site web">
+      <button type="submit">Ajouter</button>
+    </form>
+  </section>
+</main>
+
+<div id="map" class="map-panel"></div>
+
+<button id="chat-toggle">💬</button>
+<div id="chatbot">
+  <div id="chat-window"></div>
+  <input type="text" id="chat-input" placeholder="Posez une question sur le running...">
+</div>
+
+<footer>
+  <p>&copy; 2025 Running France Pro+</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<script>
+// =================== Données pré-remplies
+const clubsData=[{name:"Club Paris Running",city:"Paris",address:"10 Rue de Rivoli, Paris",website:"",img:"https://via.placeholder.com/50?text=C1",type:"club"},{name:"Marathon Lyon",city:"Lyon",address:"5 Rue de la République, Lyon",website:"",img:"https://via.placeholder.com/50?text=C2",type:"club"},{name:"Running Bordeaux",city:"Bordeaux",address:"12 Quai Richelieu, Bordeaux",website:"",img:"https://via.placeholder.com/50?text=C3",type:"club"}];
+const shopsData=[{name:"RunShop Paris",city:"Paris",address:"15 Rue Saint-Honoré, Paris",website:"",img:"https://via.placeholder.com/50?text=S1",type:"shop"},{name:"Lyon Sport",city:"Lyon",address:"22 Rue de la Barre, Lyon",website:"",img:"https://via.placeholder.com/50?text=S2",type:"shop"},{name:"Bordeaux Running Store",city:"Bordeaux",address:"8 Rue Sainte-Catherine, Bordeaux",website:"",img:"https://via.placeholder.com/50?text=S3",type:"shop"}];
+const eventsData=[{name:"Paris Marathon",city:"Paris",address:"Champs-Élysées, Paris",website:"",img:"https://via.placeholder.com/50?text=E1",type:"event"},{name:"Lyon Trail",city:"Lyon",address:"Parc de la Tête d'Or, Lyon",website:"",img:"https://via.placeholder.com/50?text=E2",type:"event"},{name:"Bordeaux Run Festival",city:"Bordeaux",address:"Place de la Bourse, Bordeaux",website:"",img:"https://via.placeholder.com/50?text=E3",type:"event"}];
+
+// =================== Carte Leaflet
+const map=L.map('map').setView([46.6,2.4],5);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+const markersCluster=L.markerClusterGroup();
+map.addLayer(markersCluster);
+
+// =================== Fonctions d'affichage et géocodage
+function displayList(data,elementId){
+  const list=document.getElementById(elementId);
+  list.innerHTML='';
+  data.forEach(item=>{
+    const li=document.createElement('li');
+    li.innerHTML=`<img src="${item.img}"><strong>${item.name}</strong> - ${item.city} ${item.website?`<a href="${item.website}" target="_blank">Site</a>`:''} <button class="fav-btn">★</button>`;
+    list.appendChild(li);
+    const btn=li.querySelector('.fav-btn');
+    let favs=JSON.parse(localStorage.getItem('favs'))||[];
+    if(favs.find(f=>f.name===item.name&&f.type===item.type)) btn.style.color='gold';
+    btn.addEventListener('click',()=>{
+      let favs=JSON.parse(localStorage.getItem('favs'))||[];
+      const index=favs.findIndex(f=>f.name===item.name&&f.type===item.type);
+      if(index>-1){favs.splice(index,1); btn.style.color='black';}else{favs.push(item); btn.style.color='gold';}
+      localStorage.setItem('favs',JSON.stringify(favs));
+    });
+  });
+}
+
+async function geocodeAndAddMarker(item){
+  try{
+    const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(item.address)}`);
+    const data=await res.json();
+    if(data.length>0){
+      let lat=data[0].lat,lon=data[0].lon;
+      let marker=L.marker([lat,lon]);
+      marker.bindPopup(`<strong>${item.name}</strong><br>${item.city}<br>${item.address}<br>${item.website?`<a href="${item.website}" target="_blank">Site web</a>`:''}<br><img src="${item.img}" width="100"><br><button onclick="addFavFromPopup('${item.name}','${item.type}')">★ Ajouter aux favoris</button>`);
+      markersCluster.addLayer(marker);
+    }
+  }catch(err){console.error(err);}
+}
+
+function addFavFromPopup(name,type){
+  const allData=[...clubsData,...shopsData,...eventsData];
+  const item=allData.find(i=>i.name===name&&i.type===type);
+  if(!item) return;
+  let favs=JSON.parse(localStorage.getItem('favs'))||[];
+  if(!favs.find(f=>f.name===name&&f.type===type)){favs.push(item);localStorage.setItem('favs',JSON.stringify(favs));alert(`${name} ajouté aux favoris !`);displayAll();}
+}
+
+function displayAll(){
+  displayList(clubsData,'club-list');
+  displayList(shopsData,'shop-list');
+  displayList(eventsData,'event-list');
+  [...clubsData,...shopsData,...eventsData].forEach(i=>geocodeAndAddMarker(i));
+  document.querySelectorAll('.card-section').forEach(section=>{setTimeout(()=>{section.classList.add('show');},100);});
+}
+displayAll();
+
+// =================== Formulaires
+document.getElementById('add-club-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const inputs=e.target.querySelectorAll('input');
+  const newItem={name:inputs[0].value,city:inputs[1].value,address:inputs[2].value,website:inputs[3].value,img:"https://via.placeholder.com/50?text=C+",type:"club"};
+  clubsData.push(newItem); displayAll(); e.target.reset();
+});
+document.getElementById('add-shop-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const inputs=e.target.querySelectorAll('input');
+  const newItem={name:inputs[0].value,city:inputs[1].value,address:inputs[2].value,website:inputs[3].value,img:"https://via.placeholder.com/50?text=S+",type:"shop"};
+  shopsData.push(newItem); displayAll(); e.target.reset();
+});
+document.getElementById('add-event-form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const inputs=e.target.querySelectorAll('input');
+  const newItem={name:inputs[0].value,city:inputs[1].value,address:inputs[2].value,website:inputs[3].value,img:"https://via.placeholder.com/50?text=E+",type:"event"};
+  eventsData.push(newItem); displayAll(); e.target.reset();
+});
+
+// =================== Chatbot
+const chatWindow=document.getElementById('chat-window');
+const chatInput=document.getElementById('chat-input');
+const chatToggle=document.getElementById('chat-toggle');
+
+chatToggle.addEventListener('click',()=>{
+  const cb=document.getElementById('chatbot');
+  cb.style.display=cb.style.display==='flex'?'none':'flex';
+  chatInput.focus();
+});
+
+chatInput.addEventListener('keypress',e=>{
+  if(e.key==='Enter'){
+    const msg=chatInput.value.trim();
+    if(msg==='') return;
+    const p=document.createElement('p');
+    p.innerHTML=`<strong>Vous:</strong> ${msg}`;
+    chatWindow.appendChild(p);
+    chatInput.value='';
+    let resp='Je ne sais pas répondre.';
+    if(/club/i.test(msg)) resp='Vous pouvez consulter la section Clubs.';
+    else if(/shop|magasin/i.test(msg)) resp='Regardez la section Magasins pour trouver des boutiques.';
+    else if(/event|évènement/i.test(msg)) resp='Tous les évènements sont listés dans la section Évènements.';
+    const r=document.createElement('p');
+    r.innerHTML=`<strong>Bot:</strong> ${resp}`;
+    chatWindow.appendChild(r);
+    chatWindow.scrollTop=chatWindow.scrollHeight;
+  }
+});
+</script>
+
+</body>
+</html>

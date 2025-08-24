@@ -1,0 +1,4 @@
+[
+  { "id":1, "name":"Paris Runners", "city":"Paris", "lat":48.8566, "lng":2.3522, "website":"https://parisrunners.fr" },
+  { "id":2, "name":"Lyon Joggers", "city":"Lyon", "lat":45.7640, "lng":4.8357, "website":"https://lyonjoggers.fr" }
+]

@@ -1,0 +1,4 @@
+[
+  { "id":1, "name":"RunShop Paris", "city":"Paris", "lat":48.8566, "lng":2.3522, "website":"https://runshopparis.fr" },
+  { "id":2, "name":"Jogging Lyon", "city":"Lyon", "lat":45.7640, "lng":4.8357, "website":"https://jogginglyon.fr" }
+]

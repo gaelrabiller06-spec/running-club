@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Running France</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+</head>
+<body>
+
+<header>
+  <div class="video-banner">
+    <video autoplay muted loop playsinline>
+      <source src="011075358-hd-city-marathon-top-view.mp4" type="video/mp4">
+      Votre navigateur ne supporte pas la vidéo.
+    </video>
+    <div class="banner-overlay">
+      <h1>Running France</h1>
+      <p>Découvrez tous les clubs, magasins et événements</p>
+    </div>
+  </div>
+  <nav>
+    <a href="#clubs">Clubs</a>
+    <a href="#shops">Magasins</a>
+    <a href="#events">Événements</a>
+    <a href="#map">Carte</a>
+  </nav>
+  <input type="text" id="global-search" placeholder="Recherche globale...">
+</header>
+
+<main>
+  <section id="clubs" class="card-section">
+    <h2>Clubs</h2>
+    <ul id="club-list"></ul>
+  </section>
+
+  <section id="shops" class="card-section">
+    <h2>Magasins</h2>
+    <ul id="shop-list"></ul>
+  </section>
+
+  <section id="events" class="card-section">
+    <h2>Événements</h2>
+    <ul id="event-list"></ul>
+  </section>
+</main>
+
+<div id="map" class="map-panel"></div>
+
+<button id="chat-toggle">💬</button>
+<div id="chatbot" class="chatbot-panel">
+  <div id="chat-window"></div>
+  <input type="text" id="chat-input" placeholder="Posez une question sur le running...">
+</div>
+
+<footer>
+  <p>&copy; 2025 Running France</p>
+</footer>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
+<meta name="description" content="Liste de clubs, magasins et événements avec carte interactive et chatbot.">
+<meta name="keywords" content="clubs, magasins, événements, carte, France">

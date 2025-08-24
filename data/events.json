@@ -1,0 +1,4 @@
+[
+  { "id":1, "name":"Marathon de Paris", "city":"Paris", "lat":48.8566, "lng":2.3522, "website":"https://parismarathon.com" },
+  { "id":2, "name":"Semi de Lyon", "city":"Lyon", "lat":45.7640, "lng":4.8357, "website":"https://semidelyon.com" }
+]
